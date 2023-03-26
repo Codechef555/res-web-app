@@ -4,17 +4,17 @@ import spacy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Function to extract text from a PDF resume
-# Remove unwanted characters and extra white spaces
+# Function to extract text from a PDF file
 def extract_text_from_pdf(file):
     with pdfplumber.open(file) as pdf:
         text = ""
         for page in pdf.pages:
             text += page.extract_text()
+    # Remove unwanted characters and extra white spaces
     text = " ".join(text.split())
     return text
 
-# Load the spacy model 
+# Load the spacy model for English language
 nlp = spacy.load("en_core_web_sm")
 
 # Create a TF-IDF vectorizer with cosine similarity
@@ -32,11 +32,11 @@ pdf_file = st.file_uploader("Upload a PDF file")
 st.subheader("Qualification")
 qualification = st.selectbox("Select your qualification:", ["B.Tech", "BCA", "M.Tech", "None"])
 
-# Input field for JD
+# Text input field for job description
 st.subheader("Job Description")
 job_description = st.text_area("Enter the job description for a software engineer:")
 
-# If a PDF file and job description are uploaded, match them and display the result or display unqualified
+# If a PDF file and job description are uploaded, match them and display the result
 if pdf_file is not None and job_description != "" and qualification != "None":
     # Convert PDF to clean text
     clean_text = extract_text_from_pdf(pdf_file)
@@ -50,9 +50,9 @@ if pdf_file is not None and job_description != "" and qualification != "None":
     # Calculate the cosine similarity between the job description and the clean text vectors
     similarity = cosine_similarity(job_description_vector, clean_text_vector)
     # Display the similarity score
-    # Determine if the resume is qualified or not based on the similarity score
     st.subheader("Match Score:")
     st.write(similarity[0][0])
+    # Determine if the resume is qualified or not based on the similarity score
     if similarity[0][0] >= 0.7:
         st.subheader("Qualified")
         st.write(f"{name}, resume matches the job description!")
@@ -64,3 +64,4 @@ elif qualification == "None":
     st.write(f"Sorry {name}, the candidate with username '{email}' does not meet job requirements because qualification is '{qualification}'.")
 else:
     st.write("fill the blanks to generate the output")
+
